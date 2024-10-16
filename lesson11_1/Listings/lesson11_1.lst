@@ -1,0 +1,121 @@
+C51 COMPILER V9.60.7.0   LESSON11_1                                                        10/12/2024 19:46:38 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LESSON11_1
+OBJECT MODULE PLACED IN .\Objects\lesson11_1.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lesson11_1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listing
+                    -s\lesson11_1.lst) TABS(2) OBJECT(.\Objects\lesson11_1.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          sbit PIN_RXD = P3^0;
+   4          sbit PIN_TXD = P3^1;
+   5          
+   6          bit RxdEnd = 0;
+   7          bit TxdEnd = 0;
+   8          bit RxdOrTxd = 0;
+   9          unsigned char RxdBuf = 0;
+  10          unsigned char TxdBuf = 0;
+  11          void ConfigUART(unsigned int baud);
+  12          void StartRXD();
+  13          void StartTXD(unsigned char dat);
+  14          
+  15          void main(){
+  16   1        EA = 1;
+  17   1        ConfigUART(9600);
+  18   1        
+  19   1        while(1){
+  20   2          while(PIN_RXD);
+  21   2          StartRXD();
+  22   2          while(!RxdEnd);
+  23   2          StartTXD(RxdBuf+1);
+  24   2          while(!TxdEnd);
+  25   2        }
+  26   1      }
+  27          
+  28          void ConfigUART(unsigned int baud){
+  29   1        TMOD &= 0xf0;
+  30   1        TMOD |= 0x02;
+  31   1        TH0 = 256 - (11059200/12)/baud;
+  32   1      }
+  33          
+  34          void StartRXD(){
+  35   1        TL0 = 256-((256 - TH0)>>1);
+  36   1        ET0 = 1;
+  37   1        TR0 = 1;
+  38   1        RxdEnd = 0;
+  39   1        RxdOrTxd = 0;
+  40   1      }
+  41          
+  42          void StartTXD(unsigned char dat){
+  43   1        TxdBuf = dat;
+  44   1        TL0 = TH0;
+  45   1        ET0 = 1;
+  46   1        TR0 = 1;
+  47   1        PIN_TXD = 0;
+  48   1        TxdEnd = 0;
+  49   1        RxdOrTxd = 1;
+  50   1      }
+  51          
+  52          void InterruptTime0() interrupt 1{
+  53   1        static unsigned char cnt = 0;
+  54   1        
+C51 COMPILER V9.60.7.0   LESSON11_1                                                        10/12/2024 19:46:38 PAGE 2   
+
+  55   1        if(RxdOrTxd){
+  56   2          cnt++;
+  57   2          if(cnt<=8){
+  58   3            PIN_TXD = TxdBuf&0x01;
+  59   3            TxdBuf>>=1;
+  60   3          }
+  61   2          else if(cnt==9){
+  62   3            PIN_TXD = 1;
+  63   3          }
+  64   2          else{
+  65   3            cnt = 0;
+  66   3            TR0 = 0;
+  67   3            TxdEnd = 1;
+  68   3          }
+  69   2        }
+  70   1        else{
+  71   2          if(cnt == 0){
+  72   3            if(!PIN_RXD){
+  73   4              RxdBuf = 0;
+  74   4              cnt++;
+  75   4            }
+  76   3            else{
+  77   4              TR0 = 0;
+  78   4            }
+  79   3          }
+  80   2          else if(cnt<=8){
+  81   3            RxdBuf>>=1;
+  82   3            if(PIN_RXD){
+  83   4              RxdBuf |= 0x80;
+  84   4            }
+  85   3            cnt++;
+  86   3          }
+  87   2          else{
+  88   3            cnt = 0;
+  89   3            TR0 = 0;
+  90   3            if(PIN_RXD){
+  91   4              RxdEnd = 1;
+  92   4            }
+  93   3          }
+  94   2        }
+  95   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    203    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      3    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

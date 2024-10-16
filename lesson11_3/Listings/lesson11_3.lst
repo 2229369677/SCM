@@ -1,0 +1,118 @@
+C51 COMPILER V9.60.7.0   LESSON11_3                                                        10/13/2024 11:23:46 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LESSON11_3
+OBJECT MODULE PLACED IN .\Objects\lesson11_3.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lesson11_3.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listing
+                    -s\lesson11_3.lst) TABS(2) OBJECT(.\Objects\lesson11_3.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          sbit ADDR3= P1^3;
+   4          sbit ENLED = P1^4;
+   5          
+   6          unsigned char code LedChar[] = {
+   7            0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8, 
+   8           0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E
+   9          };
+  10          
+  11          unsigned char LedBuff[7] = { //数码管+独立 LED 显示缓冲区 
+  12           0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF 
+  13          };
+  14          unsigned char T0RH = 0; //T0 重载值的高字节 
+  15          unsigned char T0RL = 0; //T0 重载值的低字节
+  16          unsigned char RxdByte = 0;//串口接收到的字节
+  17          
+  18          void ConfigTimer0(unsigned int ms);
+  19          void ConfigUART(unsigned int baud);
+  20          
+  21          void main(){
+  22   1        EA = 1;
+  23   1        ENLED = 0;
+  24   1        ADDR3 = 1;
+  25   1        ConfigTimer0(1);//配置T0定时1ms
+  26   1        ConfigUART(9600);
+  27   1        
+  28   1        while(1){//将接收字节在数码管上以十六进制形式显示出来
+  29   2          LedBuff[0] = LedChar[RxdByte&0x0f];
+  30   2          LedBuff[1] = LedChar[RxdByte>>4];
+  31   2        }
+  32   1      }
+  33          
+  34          void ConfigTimer0(unsigned int ms){
+  35   1        unsigned long tmp;
+  36   1        
+  37   1        tmp = 11059200/12;
+  38   1        tmp = (tmp*ms)/1000;
+  39   1        tmp = 65536 - tmp;
+  40   1        tmp = tmp+13;//补偿中断响应延时造成的误差
+  41   1        T0RH = (unsigned char)(tmp>>8);
+  42   1        T0RL = (unsigned char)(tmp);
+  43   1        TMOD &= 0xf0;
+  44   1        TMOD |= 0x01;
+  45   1        TH0 = T0RH;
+  46   1        TL0 = T0RL;
+  47   1        ET0 = 1;//开启定时器0中断
+  48   1        TR0 = 1;//启动定时器0
+  49   1      }
+  50          
+  51          void ConfigUART(unsigned int baud){
+  52   1        SCON = 0x50;
+  53   1        TMOD &= 0x0f;
+  54   1        TMOD |= 0x20;
+C51 COMPILER V9.60.7.0   LESSON11_3                                                        10/13/2024 11:23:46 PAGE 2   
+
+  55   1        
+  56   1        TH1 = 256-(11059200/12/32)/baud;
+  57   1        TL1 = TH1;
+  58   1        ET1 = 0;
+  59   1        ES = 1;
+  60   1        TR1 = 1;//启动T1
+  61   1      }
+  62          
+  63          void LedScan(){
+  64   1        static unsigned char i = 0;//索引
+  65   1        
+  66   1        P0 = 0xff;//关闭所有段选位，显示消隐
+  67   1        P1 = (P1 & 0xf8)|i;
+  68   1        P0 = LedBuff[i];
+  69   1        if(i<6){
+  70   2          i++;
+  71   2        }
+  72   1        else{
+  73   2          i = 0;
+  74   2        }
+  75   1      }
+  76          
+  77          void InterruptTimer0() interrupt 1{
+  78   1        TH0 = T0RH;
+  79   1        TL0 = T0RL;
+  80   1        LedScan();//LED扫描
+  81   1      }
+  82          
+  83          void InterruptUART() interrupt 4{
+  84   1        if(RI){
+  85   2          RI = 0;
+  86   2          RxdByte = SBUF;
+  87   2          SBUF = RxdByte;
+  88   2        }
+  89   1        if(TI){
+  90   2          TI = 0;
+  91   2        }
+  92   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    276    ----
+   CONSTANT SIZE    =     16    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11       4
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

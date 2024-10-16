@@ -1,0 +1,198 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    10/12/2024  11:05:17  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\lesson9_2.obj TO .\Objects\lesson9_2 PRINT (.\Listings\less
+>> on9_2.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\lesson9_2.obj (LESSON9_2)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?LMUL)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?ULDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?ULCMP)
+
+
+LINK MAP OF MODULE:  .\Objects\lesson9_2 (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0005H     UNIT         ?DT?LESSON9_2
+            DATA    000DH     0004H     UNIT         _DATA_GROUP_
+            IDATA   0011H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+                    000EH     07F2H                  *** GAP ***
+            CODE    0800H     012EH     UNIT         ?C?LIB_CODE
+            CODE    092EH     008CH     UNIT         ?C_C51STARTUP
+            CODE    09BAH     0083H     UNIT         ?PR?INTERRUPTTIME0?LESSON9_2
+            CODE    0A3DH     0030H     UNIT         ?PR?_STARTMOTOR?LESSON9_2
+            CODE    0A6DH     001CH     UNIT         ?PR?MAIN?LESSON9_2
+            CODE    0A89H     000AH     UNIT         ?C_INITSEG
+            CODE    0A93H     0008H     UNIT         ?CO?LESSON9_2
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\lesson9_2 (?C_STARTUP)
+
+
+SEGMENT                                DATA_GROUP 
+  +--> CALLED SEGMENT                START    LENGTH
+----------------------------------------------------
+?C_C51STARTUP                        -----    -----
+  +--> ?PR?MAIN?LESSON9_2
+  +--> ?C_INITSEG
+
+?PR?MAIN?LESSON9_2                   -----    -----
+  +--> ?PR?_STARTMOTOR?LESSON9_2
+
+?PR?_STARTMOTOR?LESSON9_2            000DH    0004H
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  11:05:17  PAGE 2
+
+
+
+*** NEW ROOT ***************************************************
+
+?PR?INTERRUPTTIME0?LESSON9_2         -----    -----
+  +--> ?CO?LESSON9_2
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lesson9_2 (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:092EH         SEGMENT       ?C_C51STARTUP
+  I:0011H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0931H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:092EH         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:092EH         LINE#         133
+  C:0930H         LINE#         134
+  C:0931H         LINE#         135
+  C:0932H         LINE#         136
+  C:0934H         LINE#         185
+  C:0937H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        LESSON9_2
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+  B:00A8H.7       PUBLIC        EA
+  D:00A8H         PUBLIC        IE
+  D:0009H         PUBLIC        beats
+  C:09BAH         PUBLIC        InterruptTime0
+  D:00B8H         PUBLIC        IP
+  C:0A3DH         PUBLIC        _StartMotor
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  11:05:17  PAGE 3
+
+
+  C:0A6DH         PUBLIC        main
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+  B:0088H.4       PUBLIC        TR0
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          MAIN
+  C:0A6DH         LINE#         5
+  C:0A6DH         LINE#         7
+  C:0A6FH         LINE#         8
+  C:0A72H         LINE#         9
+  C:0A75H         LINE#         10
+  C:0A78H         LINE#         11
+  C:0A7AH         LINE#         12
+  C:0A7CH         LINE#         14
+  C:0A87H         LINE#         15
+  -------         ENDPROC       MAIN
+  -------         PROC          _STARTMOTOR
+  D:000DH         SYMBOL        angle
+  C:0A3DH         LINE#         18
+  C:0A45H         LINE#         19
+  C:0A47H         LINE#         20
+  C:0A6AH         LINE#         21
+  C:0A6CH         LINE#         22
+  -------         ENDPROC       _STARTMOTOR
+  -------         PROC          INTERRUPTTIME0
+  -------         DO            
+  D:0007H         SYMBOL        temp
+  D:0008H         SYMBOL        index
+  C:0A93H         SYMBOL        BeatCode
+  -------         ENDDO         
+  C:09BAH         LINE#         24
+  C:09D7H         LINE#         30
+  C:09DAH         LINE#         31
+  C:09DDH         LINE#         32
+  C:09F0H         LINE#         33
+  C:09F2H         LINE#         34
+  C:09F5H         LINE#         35
+  C:0A00H         LINE#         36
+  C:0A02H         LINE#         37
+  C:0A05H         LINE#         38
+  C:0A1DH         LINE#         39
+  C:0A1FH         LINE#         40
+  C:0A1FH         LINE#         41
+  C:0A22H         LINE#         42
+  C:0A22H         LINE#         43
+  -------         ENDPROC       INTERRUPTTIME0
+  -------         ENDMOD        LESSON9_2
+
+  -------         MODULE        ?C?LMUL
+  C:0800H         PUBLIC        ?C?LMUL
+  -------         ENDMOD        ?C?LMUL
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  11:05:17  PAGE 4
+
+
+  -------         MODULE        ?C?ULDIV
+  C:088BH         PUBLIC        ?C?ULDIV
+  -------         ENDMOD        ?C?ULDIV
+
+  -------         MODULE        ?C?ULCMP
+  C:091DH         PUBLIC        ?C?ULCMP
+  -------         ENDMOD        ?C?ULCMP
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 00F2H BYTE (11%) *
+******************************************************************************
+
+Program Size: data=18.0 xdata=0 code=673
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

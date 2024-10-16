@@ -1,0 +1,98 @@
+C51 COMPILER V9.60.7.0   LESSON8_1                                                         10/11/2024 19:26:32 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LESSON8_1
+OBJECT MODULE PLACED IN .\Objects\lesson8_1.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lesson8_1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\lesson8_1.lst) TABS(2) OBJECT(.\Objects\lesson8_1.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          sbit ADDR0 = P1^0;
+   4          sbit ADDR1 = P1^1;
+   5          sbit ADDR2 = P1^2;
+   6          sbit ADDR3 = P1^3;
+   7          sbit ENLED = P1^4;
+   8          sbit Key4 = P2^7;
+   9          sbit Key3 = P2^6;
+  10          sbit Key2 = P2^5;
+  11          sbit Key1 = P2^4;
+  12          bit falg01 = 0;
+  13          bit falg02 = 0;
+  14          unsigned char code LedChar[] = {
+  15            0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90};
+  16          unsigned char LedBuff[6] = {
+  17            0xff,0xff,0xff,0xff,0xff,0xff};
+  18          unsigned char count =0;
+  19          
+  20          void main(){
+  21   1        P2 = 0xf7;
+  22   1        ADDR3 = 1;
+  23   1        ENLED = 0;
+  24   1        TMOD = 0x01;
+  25   1        TH0 = 0xbc;
+  26   1        TL0 = 0x67;
+  27   1        TR0 = 1;
+  28   1        
+  29   1        ADDR0 = 0;
+  30   1        ADDR1 = 0;
+  31   1        ADDR2 = 0;
+  32   1        P0 = 0xc0;
+  33   1        
+  34   1        EA = 1;
+  35   1        ET0 = 1;
+  36   1        
+  37   1        while(1){
+  38   2          if(falg01&&falg02){
+  39   3            falg01 = falg02 = 0;
+  40   3            count++;
+  41   3            if(count>=10){
+  42   4              count = 0;
+  43   4            }
+  44   3            P0 = LedChar[count];
+  45   3          }
+  46   2        }
+  47   1      }
+  48          
+  49          void InterruptTimer0() interrupt 1{
+  50   1        static unsigned char state  = 0xff;
+  51   1        static unsigned char i = 0;
+  52   1        {
+  53   2          (state<<1)|Key4;
+*** WARNING C275 IN LINE 53 OF lesson8_1.c: expression with possibly no effect
+C51 COMPILER V9.60.7.0   LESSON8_1                                                         10/11/2024 19:26:32 PAGE 2   
+
+  54   2          if(falg01==0&&Key4==1){
+  55   3            i++;
+  56   3          }
+  57   2          if(falg01==1&&Key4 ==0){
+  58   3            i++;
+  59   3          }
+  60   2          if(falg01==0&&i>=4){
+  61   3            i = 0;
+  62   3            falg01 = 1;
+  63   3          }
+  64   2          if(falg01==1&&i>=4){
+  65   3            i=0;
+  66   3            falg02 = 1;
+  67   3          }
+  68   2        }
+  69   1        TH0 = 0xbc;
+  70   1        TL0 = 0x67;
+  71   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    124    ----
+   CONSTANT SIZE    =     10    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      9    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

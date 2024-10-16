@@ -1,0 +1,66 @@
+C51 COMPILER V9.60.7.0   LESSON6                                                           10/09/2024 20:48:51 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LESSON6
+OBJECT MODULE PLACED IN .\Objects\lesson6.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lesson6.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\l
+                    -esson6.lst) TABS(2) OBJECT(.\Objects\lesson6.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          sbit ADDR0 = P1^0;
+   4          sbit ADDR1 = P1^1;
+   5          sbit ADDR2 = P1^2;
+   6          sbit ADDR3 = P1^3;
+   7          sbit ENLED = P1^4;
+   8          
+   9          unsigned char code LedChar[] = {
+  10            0xc0,0xf9,0xa4,0xb0,0x99,0x92,0x82,0xf8,0x80,0x90,
+  11            0x88,0x83,0xc6,0xa1,0x86,0x8e};
+  12          
+  13          void main(){
+  14   1        unsigned char cnt = 0;
+  15   1        unsigned char sec = 0;
+  16   1        //LEDS0=0,其他高
+  17   1        ADDR0 = 0;
+  18   1        ADDR1 = 0;
+  19   1        ADDR2 = 0;
+  20   1        ADDR3 = 1;
+  21   1        ENLED = 0;
+  22   1        
+  23   1        TMOD = 0x01;
+  24   1        TH0 = 0xb8;
+  25   1        TL0 = 0x00;
+  26   1        TR0 = 1;
+  27   1        while(1){
+  28   2          if(TF0==1){
+  29   3            TF0= 0;
+  30   3            TH0 = 0xb8;
+  31   3            TL0 = 0x00;
+  32   3            cnt++;
+  33   3            if(cnt>=50){
+  34   4              cnt = 0;
+  35   4              //
+  36   4              P0 = LedChar[sec++];
+  37   4              sec%=16;
+  38   4            }
+  39   3          }
+  40   2          
+  41   2        }
+  42   1      } 
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     58    ----
+   CONSTANT SIZE    =     16    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

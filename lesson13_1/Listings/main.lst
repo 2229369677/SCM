@@ -1,0 +1,221 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              10/16/2024 14:26:22 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          //计算器
+   3          
+   4          unsigned char T0RH = 0;
+   5          unsigned char T0RL = 0;
+   6          unsigned char step = 0;//操作步骤
+   7          unsigned char oprt = 0;//运算类型
+   8          signed long num1 = 0;
+   9          signed long num2 = 0;
+  10          signed long result = 0;//结果
+  11          
+  12          extern void InitLcd1602();
+  13          extern void LcdShowStr(unsigned char x,unsigned char y,unsigned char*str);
+  14          extern void KeyDriver();
+  15          extern void LcdFullClear();
+  16          extern void KeyScan();
+  17          extern void LcdAreaClear(unsigned char x, unsigned char y, unsigned char len);
+  18          void ConfigTimer0(unsigned int ms);
+  19          
+  20          void main(){
+  21   1        EA = 1;//开总中断
+  22   1        ConfigTimer0(1);//T0定时1ms
+  23   1        InitLcd1602();//初始化液晶
+  24   1        LcdShowStr(15,1,"0");
+  25   1        
+  26   1        while(1){
+  27   2          KeyDriver();//按键驱动
+  28   2        }
+  29   1      }
+  30          
+  31          void ConfigTimer0(unsigned int ms){
+  32   1        unsigned int temp;
+  33   1        temp = 11059200/12;//计数频率
+  34   1        temp = temp*ms/1000;
+  35   1        temp = 65536-temp;
+  36   1        T0RH = (unsigned char)(temp>>8);
+  37   1        T0RL = (unsigned char)temp;
+  38   1        TMOD &= 0xf0;
+  39   1        TMOD |= 0x01;
+  40   1        TH0= T0RH;
+  41   1        TL0 = T0RL;
+  42   1        ET0= 1;//启动T0中断
+  43   1        TR0 = 1;//启动T0
+  44   1      }
+  45          
+  46          //计算器复位，清零变量，清除屏幕显示
+  47          void Reset(){
+  48   1        num1 = 0;
+  49   1        num2 = 0;
+  50   1        step = 0;
+  51   1        LcdFullClear();//屏幕清除
+  52   1      }
+  53          
+  54          //long转换成字符串
+C51 COMPILER V9.60.7.0   MAIN                                                              10/16/2024 14:26:22 PAGE 2   
+
+  55          unsigned char LongToString(unsigned char *str,signed long dat){
+  56   1        signed char i = 0;
+  57   1        unsigned char len = 0;
+  58   1        unsigned char buf[12];
+  59   1        if(dat<0){
+  60   2          dat = -dat;
+  61   2          *str++ = '-';
+  62   2          len++;
+  63   2        }
+  64   1        do{
+  65   2          buf[i++] = dat%10;
+  66   2          dat/=10;
+  67   2        }while(dat>0);
+  68   1        len+=i;
+  69   1        while(i-->0){
+  70   2          *str++ = buf[i]+'0';
+  71   2        }
+  72   1        *str = '\0';
+  73   1        
+  74   1        return len;
+  75   1      }
+  76          
+  77          
+  78          //按键动作函数，n-键盘输入的值
+  79          void NumKeyAction(unsigned char n){
+  80   1        unsigned char len;
+  81   1        unsigned char str[12];
+  82   1        
+  83   1        if(step>1){//计算完成
+  84   2          Reset();
+  85   2        }
+  86   1        if(step == 0){//输入第一操作数
+  87   2          num1 = num1*10+n;
+  88   2          len = LongToString(str,num2);//新数值转换为字符串，返回长度
+  89   2          LcdShowStr(16-len,1,str);//显示到第二行上
+  90   2        }
+  91   1        else{
+  92   2          num2 = num2*10+n;
+  93   2          len = LongToString(str,num2);
+  94   2          LcdShowStr(16-len,1,str);
+  95   2        }
+  96   1      }
+  97          
+  98          void ShowOprt(unsigned char y, unsigned char type)
+  99          {
+ 100   1          switch (type)
+ 101   1          {
+ 102   2              case 0: LcdShowStr(0, y, "+"); break;  
+ 103   2              case 1: LcdShowStr(0, y, "-"); break;  
+ 104   2              case 2: LcdShowStr(0, y, "*"); break;  
+ 105   2              case 3: LcdShowStr(0, y, "/"); break;  
+ 106   2              default: break;
+ 107   2          }
+ 108   1      }
+ 109          
+ 110          void OprtKeyAction(unsigned char type){
+ 111   1        
+ 112   1        unsigned char len;
+ 113   1        unsigned char str[12];
+ 114   1        if(step==0){
+ 115   2          len = LongToString(str,num1);//第一操作数转换成字符串
+ 116   2          LcdAreaClear(0,0,16-len);//清除第一行数字
+C51 COMPILER V9.60.7.0   MAIN                                                              10/16/2024 14:26:22 PAGE 3   
+
+ 117   2          LcdShowStr(16-len, 0, str);
+ 118   2          ShowOprt(1, type);         //显示操作符
+ 119   2          LcdAreaClear(1, 1, 14);    
+ 120   2          LcdShowStr(15, 1, "0");    
+ 121   2          oprt = type;               
+ 122   2          step = 1;
+ 123   2          
+ 124   2        }
+ 125   1      }
+ 126          
+ 127          //计算结果
+ 128          void GetResult()
+ 129          {
+ 130   1          unsigned char len;
+ 131   1          unsigned char str[12];
+ 132   1          
+ 133   1          if (step == 1) 
+ 134   1          {
+ 135   2              step = 2;
+ 136   2              switch (oprt)
+ 137   2              {
+ 138   3                  case 0: result = num1 + num2; break;
+ 139   3                  case 1: result = num1 - num2; break;
+ 140   3                  case 2: result = num1 * num2; break;
+ 141   3                  case 3: result = num1 / num2; break;
+ 142   3                  default: break;
+ 143   3              }
+ 144   2              len = LongToString(str, num2);
+ 145   2              ShowOprt(0, oprt);
+ 146   2              LcdAreaClear(1, 0, 16-1-len);
+ 147   2              LcdShowStr(16-len, 0, str);
+ 148   2              len = LongToString(str, result);
+ 149   2              LcdShowStr(0, 1, "=");
+ 150   2              LcdAreaClear(1, 1, 16-1-len);
+ 151   2              LcdShowStr(16-len, 1, str);
+ 152   2          }
+ 153   1      }
+ 154          
+ 155          void KeyAction(unsigned char keycode){
+ 156   1        if  ((keycode>='0') && (keycode<='9'))  
+ 157   1          {
+ 158   2              NumKeyAction(keycode - '0');
+ 159   2          }
+ 160   1          else if (keycode == 0x26)
+ 161   1          {
+ 162   2              OprtKeyAction(0);
+ 163   2          }
+ 164   1          else if (keycode == 0x28)
+ 165   1          {
+ 166   2              OprtKeyAction(1);
+ 167   2          }
+ 168   1          else if (keycode == 0x25)
+ 169   1          {
+ 170   2              OprtKeyAction(2);
+ 171   2          }
+ 172   1          else if (keycode == 0x27)
+ 173   1          {
+ 174   2              OprtKeyAction(3);
+ 175   2          }
+ 176   1          else if (keycode == 0x0D)
+ 177   1          {
+ 178   2              GetResult();
+C51 COMPILER V9.60.7.0   MAIN                                                              10/16/2024 14:26:22 PAGE 4   
+
+ 179   2          }
+ 180   1          else if (keycode == 0x1B)
+ 181   1          {
+ 182   2              Reset();
+ 183   2              LcdShowStr(15, 1, "0");
+ 184   2          }
+ 185   1      }
+ 186          
+ 187          void InterruptTimer0() interrupt 1{
+ 188   1        TH0 = T0RH;
+ 189   1        TL0 = T0RL;
+ 190   1        KeyScan();
+ 191   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    980    ----
+   CONSTANT SIZE    =     12    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     16      64
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,78 @@
+C51 COMPILER V9.60.7.0   LESSON9_4                                                         10/13/2024 16:05:49 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LESSON9_4
+OBJECT MODULE PLACED IN .\Objects\lesson9_4.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lesson9_4.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\lesson9_4.lst) TABS(2) OBJECT(.\Objects\lesson9_4.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          sbit BUZZ = P1^6;
+   4          
+   5          unsigned char T0RH = 0;
+   6          unsigned char T0RL = 0;
+   7          void OpenBuzz(unsigned int frequ);
+   8          void StopBuzz();
+   9          void StopBuzz();
+  10          
+  11          void main(){
+  12   1        unsigned int i;
+  13   1        
+  14   1        EA = 1;
+  15   1        TMOD = 0x01;
+  16   1        
+  17   1        while(1){
+  18   2          OpenBuzz(4000);
+  19   2          for(i = 0;i<40000;i++);
+  20   2          StopBuzz();
+  21   2          for(i = 0;i<40000;i++);
+  22   2          OpenBuzz(1000);
+  23   2          for(i = 0;i<40000;i++);
+  24   2          StopBuzz();
+  25   2        }
+  26   1      }
+  27          
+  28          void OpenBuzz(unsigned int frequ){
+  29   1        unsigned int reload;
+  30   1        
+  31   1        reload = 65536-(11059200/12)/(frequ*2);
+  32   1        T0RH = (unsigned char)(reload>>8);
+  33   1        T0RL = (unsigned char)(reload);
+  34   1        
+  35   1        TH0 = 0xff;
+  36   1        TL0 = 0xfe;
+  37   1        
+  38   1        ET0 = 1;
+  39   1        TR0 = 1;
+  40   1      }
+  41          
+  42          void StopBuzz(){
+  43   1        ET0 = 0;
+  44   1        TR0= 0;
+  45   1      }
+  46          
+  47          
+  48          void InterruptTimer0() interrupt 1{
+  49   1        TH0 = T0RH;
+  50   1        TL0 = T0RL;
+  51   1        BUZZ = ~BUZZ;
+  52   1      }
+
+
+C51 COMPILER V9.60.7.0   LESSON9_4                                                         10/13/2024 16:05:49 PAGE 2   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    164    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

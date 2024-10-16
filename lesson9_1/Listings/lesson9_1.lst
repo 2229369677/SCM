@@ -1,0 +1,66 @@
+C51 COMPILER V9.60.7.0   LESSON9_1                                                         10/11/2024 20:54:53 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE LESSON9_1
+OBJECT MODULE PLACED IN .\Objects\lesson9_1.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE lesson9_1.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings
+                    -\lesson9_1.lst) TABS(2) OBJECT(.\Objects\lesson9_1.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          void TurnMotor(unsigned long angle);
+   4          
+   5          void main()
+   6          {
+   7   1          TurnMotor(360*25); //360¶È*25£¬¼´25È¦
+   8   1          while (1);
+   9   1      }
+  10          /* Èí¼þÑÓÊ±º¯Êý£¬ÑÓÊ±Ô¼2ms */
+  11          void delay()
+  12          {
+  13   1          unsigned int i = 200;
+  14   1        
+  15   1          while (i--);
+  16   1      }
+  17          /* ²½½øµç»ú×ª¶¯º¯Êý£¬angle-Ðè×ª¹ýµÄ½Ç¶È */
+  18          void TurnMotor(unsigned long angle)
+  19          {
+  20   1          unsigned char tmp;  //ÁÙÊ±±äÁ¿
+  21   1          unsigned char index = 0;  //½ÚÅÄÊä³öË÷Òý
+  22   1          unsigned long beats = 0;  //ËùÐè½ÚÅÄ×ÜÊý
+  23   1          unsigned char code BeatCode[8] = {  //²½½øµç»ú½ÚÅÄ¶ÔÓ¦µÄIO¿ØÖÆ´úÂë
+  24   1              0xE, 0xC, 0xD, 0x9, 0xB, 0x3, 0x7, 0x6
+  25   1          };
+  26   1          
+  27   1          beats = (angle*4096) / 360; //¼ÆËãÐèÒªµÄ½ÚÅÄ×ÜÊý£¬4096ÅÄ¶ÔÓ¦Ò»È¦
+  28   1          while (beats--)  //ÅÐ¶Ïbeats²»Îª0Ê±Ö´ÐÐÑ­»·£¬È»ºó×Ô¼õ1
+  29   1          {
+  30   2              tmp = P1;                    //ÓÃtmp°ÑP1¿Úµ±Ç°ÖµÔÝ´æ
+  31   2              tmp = tmp & 0xF0;            //ÓÃ&²Ù×÷ÇåÁãµÍ4Î»
+  32   2              tmp = tmp | BeatCode[index]; //ÓÃ|²Ù×÷°Ñ½ÚÅÄ´úÂëÐ´µ½µÍ4Î»
+  33   2              P1  = tmp;                   //°ÑµÍ4Î»µÄ½ÚÅÄ´úÂëºÍ¸ß4Î»µÄÔ­ÖµËÍ»ØP
+             -1
+  34   2              index++;                     //½ÚÅÄÊä³öË÷ÒýµÝÔö
+  35   2              index = index & 0x07;        //ÓÃ&²Ù×÷ÊµÏÖµ½8¹éÁã
+  36   2              delay();                     //ÑÓÊ±2ms£¬¼´2msÖ´ÐÐÒ»ÅÄ
+  37   2          }
+  38   1          P1 = P1 | 0x0F;  //¹Ø±Õµç»úËùÓÐµÄÏà
+  39   1      }
+  40          
+  41          //x*12/11059200 = 0.002 x = 1843  T0 = y; y+x = 65536 y = 63693; y = b8c4
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    123    ----
+   CONSTANT SIZE    =      8    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       9
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

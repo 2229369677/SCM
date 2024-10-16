@@ -1,0 +1,199 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    10/13/2024  16:05:49  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\lesson9_4.obj TO .\Objects\lesson9_4 PRINT (.\Listings\less
+>> on9_4.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\lesson9_4.obj (LESSON9_4)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?SLDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?SLCMP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?ULDIV)
+
+
+LINK MAP OF MODULE:  .\Objects\lesson9_4 (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0002H     UNIT         ?DT?LESSON9_4
+            IDATA   000AH     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+                    000EH     07F2H                  *** GAP ***
+            CODE    0800H     00E4H     UNIT         ?C?LIB_CODE
+            CODE    08E4H     008CH     UNIT         ?C_C51STARTUP
+            CODE    0970H     006AH     UNIT         ?PR?MAIN?LESSON9_4
+            CODE    09DAH     0044H     UNIT         ?C?LDIV
+            CODE    0A1EH     002CH     UNIT         ?PR?_OPENBUZZ?LESSON9_4
+            CODE    0A4AH     0009H     UNIT         ?PR?INTERRUPTTIMER0?LESSON9_4
+            CODE    0A53H     0007H     UNIT         ?C_INITSEG
+            CODE    0A5AH     0005H     UNIT         ?PR?STOPBUZZ?LESSON9_4
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\lesson9_4 (?C_STARTUP)
+
+
+SEGMENT
+  +--> CALLED SEGMENT
+---------------------
+?C_C51STARTUP
+  +--> ?PR?MAIN?LESSON9_4
+  +--> ?C_INITSEG
+
+?PR?MAIN?LESSON9_4
+  +--> ?PR?_OPENBUZZ?LESSON9_4
+  +--> ?PR?STOPBUZZ?LESSON9_4
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/13/2024  16:05:49  PAGE 2
+
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lesson9_4 (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:08E4H         SEGMENT       ?C_C51STARTUP
+  I:000AH         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:08E7H         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:08E4H         SYMBOL        STARTUP1
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:08E4H         LINE#         133
+  C:08E6H         LINE#         134
+  C:08E7H         LINE#         135
+  C:08E8H         LINE#         136
+  C:08EAH         LINE#         185
+  C:08EDH         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        LESSON9_4
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00B0H         PUBLIC        P3
+  B:00A8H.7       PUBLIC        EA
+  C:0A4AH         PUBLIC        InterruptTimer0
+  D:00A8H         PUBLIC        IE
+  D:00B8H         PUBLIC        IP
+  D:0008H         PUBLIC        T0RH
+  D:0009H         PUBLIC        T0RL
+  C:0970H         PUBLIC        main
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  C:0A1EH         PUBLIC        _OpenBuzz
+  B:00A8H.1       PUBLIC        ET0
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/13/2024  16:05:49  PAGE 3
+
+
+  B:0090H.6       PUBLIC        BUZZ
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+  C:0A5AH         PUBLIC        StopBuzz
+  B:0088H.4       PUBLIC        TR0
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          MAIN
+  -------         DO            
+  D:0082H         SYMBOL        i
+  -------         ENDDO         
+  C:0970H         LINE#         11
+  C:0970H         LINE#         14
+  C:0972H         LINE#         15
+  C:0975H         LINE#         17
+  C:0975H         LINE#         18
+  C:097CH         LINE#         19
+  C:0995H         LINE#         20
+  C:0998H         LINE#         21
+  C:09B3H         LINE#         22
+  C:09BAH         LINE#         23
+  C:09D5H         LINE#         24
+  C:09D8H         LINE#         25
+  -------         ENDPROC       MAIN
+  -------         PROC          _OPENBUZZ
+  D:0006H         SYMBOL        frequ
+  -------         DO            
+  D:0004H         SYMBOL        reload
+  -------         ENDDO         
+  C:0A1EH         LINE#         28
+  C:0A1EH         LINE#         31
+  C:0A3BH         LINE#         32
+  C:0A3DH         LINE#         33
+  C:0A3FH         LINE#         35
+  C:0A42H         LINE#         36
+  C:0A45H         LINE#         38
+  C:0A47H         LINE#         39
+  C:0A49H         LINE#         40
+  -------         ENDPROC       _OPENBUZZ
+  -------         PROC          STOPBUZZ
+  C:0A5AH         LINE#         42
+  C:0A5AH         LINE#         43
+  C:0A5CH         LINE#         44
+  C:0A5EH         LINE#         45
+  -------         ENDPROC       STOPBUZZ
+  -------         PROC          INTERRUPTTIMER0
+  C:0A4AH         LINE#         48
+  C:0A4AH         LINE#         49
+  C:0A4DH         LINE#         50
+  C:0A50H         LINE#         51
+  C:0A52H         LINE#         52
+  -------         ENDPROC       INTERRUPTTIMER0
+  -------         ENDMOD        LESSON9_4
+
+  -------         MODULE        ?C?SLDIV
+  C:09DAH         PUBLIC        ?C?SLDIV
+  -------         ENDMOD        ?C?SLDIV
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/13/2024  16:05:49  PAGE 4
+
+
+
+  -------         MODULE        ?C?SLCMP
+  C:0800H         PUBLIC        ?C?SLCMP
+  -------         ENDMOD        ?C?SLCMP
+
+  -------         MODULE        ?C?ULDIV
+  C:0852H         PUBLIC        ?C?ULDIV
+  -------         ENDMOD        ?C?ULDIV
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 00BCH BYTE ( 9%) *
+******************************************************************************
+
+Program Size: data=11.0 xdata=0 code=613
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)

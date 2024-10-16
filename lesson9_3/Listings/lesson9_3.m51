@@ -1,0 +1,359 @@
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                    10/12/2024  16:22:05  PAGE 1
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0, INVOKED BY:
+C:\KEIL_V5\C51\BIN\BL51.EXE .\Objects\STARTUP.obj, .\Objects\lesson9_3.obj TO .\Objects\lesson9_3 PRINT (.\Listings\less
+>> on9_3.m51) RAMSIZE (256)
+
+
+MEMORY MODEL: SMALL
+
+
+INPUT MODULES INCLUDED:
+  .\Objects\STARTUP.obj (?C_STARTUP)
+  .\Objects\lesson9_3.obj (LESSON9_3)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C_INIT)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?IMUL)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?LMUL)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?SLDIV)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?SLCMP)
+  C:\KEIL_V5\C51\LIB\C51S.LIB (?C?ULDIV)
+
+
+LINK MAP OF MODULE:  .\Objects\lesson9_3 (?C_STARTUP)
+
+
+            TYPE    BASE      LENGTH    RELOCATION   SEGMENT NAME
+            -----------------------------------------------------
+
+            * * * * * * *   D A T A   M E M O R Y   * * * * * * *
+            REG     0000H     0008H     ABSOLUTE     "REG BANK 0"
+            DATA    0008H     0007H     UNIT         _DATA_GROUP_
+                    000FH     0011H                  *** GAP ***
+            BIT     0020H.0   0000H.2   UNIT         ?BI?LESSON9_3
+                    0020H.2   0000H.6                *** GAP ***
+            DATA    0021H     0036H     UNIT         ?DT?LESSON9_3
+            IDATA   0057H     0001H     UNIT         ?STACK
+
+            * * * * * * *   C O D E   M E M O R Y   * * * * * * *
+            CODE    0000H     0003H     ABSOLUTE     
+                    0003H     0008H                  *** GAP ***
+            CODE    000BH     0003H     ABSOLUTE     
+                    000EH     07F2H                  *** GAP ***
+            CODE    0800H     0145H     UNIT         ?C?LIB_CODE
+            CODE    0945H     00D3H     UNIT         ?PR?KEYSCAN?LESSON9_3
+            CODE    0A18H     008CH     UNIT         ?C_C51STARTUP
+            CODE    0AA4H     0075H     UNIT         ?PR?TURNMOTOR?LESSON9_3
+            CODE    0B19H     0073H     UNIT         ?PR?KEYDRIVER?LESSON9_3
+            CODE    0B8CH     0071H     UNIT         ?PR?_KEYACTION?LESSON9_3
+            CODE    0BFDH     0049H     UNIT         ?PR?INTERRUPRTIME0?LESSON9_3
+            CODE    0C46H     0047H     UNIT         ?C_INITSEG
+            CODE    0C8DH     0044H     UNIT         ?C?LDIV
+            CODE    0CD1H     0031H     UNIT         ?PR?_STARTMOTOR?LESSON9_3
+            CODE    0D02H     0018H     UNIT         ?CO?LESSON9_3
+            CODE    0D1AH     0014H     UNIT         ?PR?MAIN?LESSON9_3
+            CODE    0D2EH     000EH     UNIT         ?PR?STOPMOTOR?LESSON9_3
+
+
+
+OVERLAY MAP OF MODULE:   .\Objects\lesson9_3 (?C_STARTUP)
+
+
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  16:22:05  PAGE 2
+
+
+SEGMENT                                DATA_GROUP 
+  +--> CALLED SEGMENT                START    LENGTH
+----------------------------------------------------
+?C_C51STARTUP                        -----    -----
+  +--> ?PR?MAIN?LESSON9_3
+  +--> ?C_INITSEG
+
+?PR?MAIN?LESSON9_3                   -----    -----
+  +--> ?PR?KEYDRIVER?LESSON9_3
+
+?PR?KEYDRIVER?LESSON9_3              0008H    0002H
+  +--> ?CO?LESSON9_3
+  +--> ?PR?_KEYACTION?LESSON9_3
+
+?PR?_KEYACTION?LESSON9_3             000AH    0001H
+  +--> ?PR?_STARTMOTOR?LESSON9_3
+  +--> ?PR?STOPMOTOR?LESSON9_3
+
+?PR?_STARTMOTOR?LESSON9_3            000BH    0004H
+
+*** NEW ROOT ***************************************************
+
+?PR?INTERRUPRTIME0?LESSON9_3         -----    -----
+  +--> ?PR?KEYSCAN?LESSON9_3
+  +--> ?PR?TURNMOTOR?LESSON9_3
+
+?PR?TURNMOTOR?LESSON9_3              -----    -----
+  +--> ?CO?LESSON9_3
+
+
+
+SYMBOL TABLE OF MODULE:  .\Objects\lesson9_3 (?C_STARTUP)
+
+  VALUE           TYPE          NAME
+  ----------------------------------
+
+  -------         MODULE        ?C_STARTUP
+  C:0A18H         SEGMENT       ?C_C51STARTUP
+  I:0057H         SEGMENT       ?STACK
+  C:0000H         PUBLIC        ?C_STARTUP
+  D:00E0H         SYMBOL        ACC
+  D:00F0H         SYMBOL        B
+  D:0083H         SYMBOL        DPH
+  D:0082H         SYMBOL        DPL
+  N:0000H         SYMBOL        IBPSTACK
+  N:0100H         SYMBOL        IBPSTACKTOP
+  N:0080H         SYMBOL        IDATALEN
+  C:0A1BH         SYMBOL        IDATALOOP
+  N:0000H         SYMBOL        PBPSTACK
+  N:0100H         SYMBOL        PBPSTACKTOP
+  N:0000H         SYMBOL        PDATALEN
+  N:0000H         SYMBOL        PDATASTART
+  N:0000H         SYMBOL        PPAGE
+  N:0000H         SYMBOL        PPAGEENABLE
+  D:00A0H         SYMBOL        PPAGE_SFR
+  D:0081H         SYMBOL        SP
+  C:0A18H         SYMBOL        STARTUP1
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  16:22:05  PAGE 3
+
+
+  N:0000H         SYMBOL        XBPSTACK
+  N:0000H         SYMBOL        XBPSTACKTOP
+  N:0000H         SYMBOL        XDATALEN
+  N:0000H         SYMBOL        XDATASTART
+  C:0000H         LINE#         126
+  C:0A18H         LINE#         133
+  C:0A1AH         LINE#         134
+  C:0A1BH         LINE#         135
+  C:0A1CH         LINE#         136
+  C:0A1EH         LINE#         185
+  C:0A21H         LINE#         196
+  -------         ENDMOD        ?C_STARTUP
+
+  -------         MODULE        LESSON9_3
+  C:0000H         SYMBOL        _ICE_DUMMY_
+  D:0090H         PUBLIC        P1
+  D:00A0H         PUBLIC        P2
+  D:00B0H         PUBLIC        P3
+  B:00A8H.7       PUBLIC        EA
+  C:0B8CH         PUBLIC        _KeyAction
+  D:00A8H         PUBLIC        IE
+  D:0043H         PUBLIC        beats
+  C:0BFDH         PUBLIC        InterruprTime0
+  B:00A0H.4       PUBLIC        KeyIn1
+  B:00A0H.5       PUBLIC        KeyIn2
+  B:00A0H.3       PUBLIC        KeyOut1
+  B:00A0H.6       PUBLIC        KeyIn3
+  B:00A0H.2       PUBLIC        KeyOut2
+  B:00A0H.7       PUBLIC        KeyIn4
+  B:00A0H.1       PUBLIC        KeyOut3
+  B:00A0H.0       PUBLIC        KeyOut4
+  D:00B8H         PUBLIC        IP
+  C:0B19H         PUBLIC        KeyDriver
+  C:0CD1H         PUBLIC        _StartMotor
+  C:0D1AH         PUBLIC        main
+  C:0945H         PUBLIC        KeyScan
+  D:0098H         PUBLIC        SCON
+  D:0089H         PUBLIC        TMOD
+  D:0088H         PUBLIC        TCON
+  C:0D2EH         PUBLIC        StopMotor
+  C:0AA4H         PUBLIC        TurnMotor
+  C:0D02H         PUBLIC        KeyCodeMap
+  B:00A8H.1       PUBLIC        ET0
+  D:008CH         PUBLIC        TH0
+  D:008AH         PUBLIC        TL0
+  D:0047H         PUBLIC        KeySta
+  B:0088H.4       PUBLIC        TR0
+  D:00C8H         PUBLIC        T2CON
+  D:00D0H         PUBLIC        PSW
+  -------         PROC          MAIN
+  C:0D1AH         LINE#         27
+  C:0D1AH         LINE#         28
+  C:0D1CH         LINE#         29
+  C:0D1FH         LINE#         30
+  C:0D22H         LINE#         31
+  C:0D25H         LINE#         32
+  C:0D27H         LINE#         33
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  16:22:05  PAGE 4
+
+
+  C:0D29H         LINE#         34
+  C:0D29H         LINE#         35
+  C:0D2CH         LINE#         36
+  -------         ENDPROC       MAIN
+  -------         PROC          _STARTMOTOR
+  D:000BH         SYMBOL        angle
+  C:0CD1H         LINE#         39
+  C:0CD9H         LINE#         40
+  C:0CDBH         LINE#         41
+  C:0CFFH         LINE#         42
+  C:0D01H         LINE#         43
+  -------         ENDPROC       _STARTMOTOR
+  -------         PROC          STOPMOTOR
+  C:0D2EH         LINE#         45
+  C:0D2EH         LINE#         46
+  C:0D30H         LINE#         47
+  C:0D39H         LINE#         48
+  C:0D3BH         LINE#         49
+  -------         ENDPROC       STOPMOTOR
+  -------         PROC          _KEYACTION
+  D:000AH         SYMBOL        keycode
+  -------         DO            
+  B:0020H.0       SYMBOL        dirMotor
+  -------         ENDDO         
+  C:0B8CH         LINE#         51
+  C:0B8EH         LINE#         54
+  C:0B9CH         LINE#         55
+  C:0B9FH         LINE#         56
+  C:0BABH         LINE#         57
+  C:0BADH         LINE#         58
+  C:0BADH         LINE#         59
+  C:0BC3H         LINE#         60
+  C:0BC3H         LINE#         61
+  C:0BC5H         LINE#         62
+  C:0BCAH         LINE#         63
+  C:0BCCH         LINE#         64
+  C:0BCDH         LINE#         65
+  C:0BD2H         LINE#         66
+  C:0BD4H         LINE#         67
+  C:0BD5H         LINE#         68
+  C:0BDAH         LINE#         69
+  C:0BE2H         LINE#         70
+  C:0BE4H         LINE#         71
+  C:0BE9H         LINE#         72
+  C:0BF4H         LINE#         73
+  C:0BF4H         LINE#         74
+  C:0BF9H         LINE#         75
+  C:0BFCH         LINE#         76
+  C:0BFCH         LINE#         77
+  -------         ENDPROC       _KEYACTION
+  -------         PROC          KEYDRIVER
+  -------         DO            
+  D:0008H         SYMBOL        i
+  D:0009H         SYMBOL        j
+  D:0021H         SYMBOL        backup
+  -------         ENDDO         
+  C:0B19H         LINE#         79
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  16:22:05  PAGE 5
+
+
+  C:0B19H         LINE#         84
+  C:0B1CH         LINE#         85
+  C:0B1FH         LINE#         86
+  C:0B3CH         LINE#         87
+  C:0B3FH         LINE#         88
+  C:0B5FH         LINE#         89
+  C:0B5FH         LINE#         90
+  C:0B79H         LINE#         91
+  C:0B79H         LINE#         92
+  C:0B82H         LINE#         93
+  C:0B8BH         LINE#         94
+  -------         ENDPROC       KEYDRIVER
+  -------         PROC          KEYSCAN
+  -------         DO            
+  D:0007H         SYMBOL        i
+  D:0031H         SYMBOL        keyout
+  D:0032H         SYMBOL        keybuf
+  -------         ENDDO         
+  C:0945H         LINE#         96
+  C:0945H         LINE#         104
+  C:0963H         LINE#         105
+  C:0981H         LINE#         106
+  C:099FH         LINE#         107
+  C:09BDH         LINE#         109
+  C:09BFH         LINE#         110
+  C:09CFH         LINE#         111
+  C:09DBH         LINE#         112
+  C:09DDH         LINE#         113
+  C:09E0H         LINE#         114
+  C:09ECH         LINE#         115
+  C:09ECH         LINE#         116
+  C:09F0H         LINE#         117
+  C:09F2H         LINE#         118
+  C:09F5H         LINE#         119
+  C:0A04H         LINE#         120
+  C:0A09H         LINE#         121
+  C:0A0EH         LINE#         122
+  C:0A13H         LINE#         123
+  C:0A17H         LINE#         124
+  C:0A17H         LINE#         125
+  C:0A17H         LINE#         126
+  -------         ENDPROC       KEYSCAN
+  -------         PROC          TURNMOTOR
+  -------         DO            
+  D:0007H         SYMBOL        tmp
+  D:0042H         SYMBOL        index
+  C:0D12H         SYMBOL        BeatCode
+  -------         ENDDO         
+  C:0AA4H         LINE#         128
+  C:0AA4H         LINE#         134
+  C:0AB2H         LINE#         135
+  C:0AC5H         LINE#         136
+  C:0AC7H         LINE#         137
+  C:0ADDH         LINE#         138
+  C:0ADDH         LINE#         139
+  C:0ADFH         LINE#         140
+  C:0AEBH         LINE#         141
+BL51 BANKED LINKER/LOCATER V6.22.4.0                                                  10/12/2024  16:22:05  PAGE 6
+
+
+  C:0AEDH         LINE#         142
+  C:0B02H         LINE#         143
+  C:0B05H         LINE#         144
+  C:0B05H         LINE#         145
+  C:0B07H         LINE#         146
+  C:0B0AH         LINE#         147
+  C:0B12H         LINE#         148
+  C:0B14H         LINE#         149
+  C:0B15H         LINE#         150
+  C:0B15H         LINE#         151
+  C:0B18H         LINE#         152
+  C:0B18H         LINE#         153
+  -------         ENDPROC       TURNMOTOR
+  -------         PROC          INTERRUPRTIME0
+  -------         DO            
+  B:0020H.1       SYMBOL        div
+  -------         ENDDO         
+  C:0BFDH         LINE#         155
+  C:0C1AH         LINE#         158
+  C:0C1DH         LINE#         159
+  C:0C20H         LINE#         160
+  C:0C23H         LINE#         162
+  C:0C25H         LINE#         163
+  C:0C28H         LINE#         164
+  C:0C2BH         LINE#         165
+  C:0C2BH         LINE#         166
+  -------         ENDPROC       INTERRUPRTIME0
+  -------         ENDMOD        LESSON9_3
+
+  -------         MODULE        ?C?IMUL
+  C:0800H         PUBLIC        ?C?IMUL
+  -------         ENDMOD        ?C?IMUL
+
+  -------         MODULE        ?C?LMUL
+  C:0812H         PUBLIC        ?C?LMUL
+  -------         ENDMOD        ?C?LMUL
+
+  -------         MODULE        ?C?SLDIV
+  C:0C8DH         PUBLIC        ?C?SLDIV
+  -------         ENDMOD        ?C?SLDIV
+
+  -------         MODULE        ?C?SLCMP
+  C:0861H         PUBLIC        ?C?SLCMP
+  -------         ENDMOD        ?C?SLCMP
+
+  -------         MODULE        ?C?ULDIV
+  C:08B3H         PUBLIC        ?C?ULDIV
+  -------         ENDMOD        ?C?ULDIV
+
+******************************************************************************
+* RESTRICTED VERSION WITH 0800H BYTE CODE SIZE LIMIT; USED: 0338H BYTE (40%) *
+******************************************************************************
+
+Program Size: data=70.2 xdata=0 code=1346
+LINK/LOCATE RUN COMPLETE.  0 WARNING(S),  0 ERROR(S)
