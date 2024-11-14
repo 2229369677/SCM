@@ -1,0 +1,103 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              10/30/2024 11:57:45 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          //接收并解析NEC协议的红外编码，并将用户码喝键码显示到数码管上
+   2          
+   3          #include <REG52.H>
+   4          
+   5          sbit ADDR3 = P1^3;
+   6          sbit ENLED = P1^4;
+   7          
+   8          unsigned char code LedChar[] = {
+   9              0xC0, 0xF9, 0xA4, 0xB0, 0x99, 0x92, 0x82, 0xF8,
+  10              0x80, 0x90, 0x88, 0x83, 0xC6, 0xA1, 0x86, 0x8E
+  11          };
+  12          
+  13          unsigned char LedBuff[6] = {  //数码管显示缓冲区
+  14              0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+  15          };
+  16          unsigned char T0RH = 0;
+  17          unsigned char T0RL = 0;
+  18          
+  19          extern bit irflag;//红外信号标志
+  20          extern unsigned char ircode[4];
+  21          extern void InitInfrared();
+  22          void ConfigTimer0(unsigned int ms);
+  23          
+  24          void main(){
+  25   1        EA = 1;
+  26   1        ENLED = 0;
+  27   1        ADDR3  =1;
+  28   1        InitInfrared();//初始化红外功能
+  29   1        ConfigTimer0(1);
+  30   1        PT0 = 1;//配置T0中断为高优先级，可以消除接收时的闪烁
+  31   1        
+  32   1        while(1){
+  33   2          if(irflag){
+  34   3            irflag = 0;
+  35   3            LedBuff[5] = LedChar[ircode[0] >> 4];
+  36   3            LedBuff[4] = LedChar[ircode[0]&0x0F];
+  37   3            LedBuff[1] = LedChar[ircode[2] >> 4];
+  38   3            LedBuff[0] = LedChar[ircode[2]&0x0F];
+  39   3          }
+  40   2        }
+  41   1      }
+  42          
+  43          
+  44          void ConfigTimer0(unsigned int ms){
+  45   1        unsigned char tmp;
+  46   1        
+  47   1        tmp = 11059200/12;
+  48   1        tmp = (tmp*ms)/1000;
+  49   1        tmp = 65536-tmp;
+  50   1        tmp = tmp+13;
+  51   1        T0RH = (unsigned char)(tmp>>8);
+  52   1        T0RL = (unsigned char)tmp;
+  53   1        TMOD &=0xf0;
+  54   1        TMOD |=0x01;
+C51 COMPILER V9.60.7.0   MAIN                                                              10/30/2024 11:57:45 PAGE 2   
+
+  55   1        TH0 = T0RH;
+  56   1        TL0 = T0RL;
+  57   1        ET0 = 1;
+  58   1        TR0 = 1;
+  59   1      }
+  60          
+  61          void LedScan(){
+  62   1        static unsigned char i = 0;
+  63   1        
+  64   1        P0 = 0xff;
+  65   1        P1 = (P1&0xf8)|i;//位选
+  66   1        P0 = LedBuff[i];
+  67   1        if(i<sizeof(LedBuff)-1)
+  68   1          i++;
+  69   1        else
+  70   1          i = 0;
+  71   1      }
+  72          
+  73          void InterruptTimr0() interrupt 1{
+  74   1        TH0 = T0RH;
+  75   1        TL0 = T0RL;
+  76   1        LedScan();//数码管扫描显示
+  77   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    160    ----
+   CONSTANT SIZE    =     16    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      9    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

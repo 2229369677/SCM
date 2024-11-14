@@ -1,0 +1,116 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              10/20/2024 11:49:40 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          //IIC总线寻址
+   2          #include <REG52.H>
+   3          #include <intrins.h>
+   4          
+   5          #define I2CDelay() {_nop_();_nop_();_nop_();_nop_();}
+   6          sbit I2C_SCL = P3^7;
+   7          sbit I2C_SDA = P3^6;
+   8          
+   9          bit I2CAddressing(unsigned char addr);
+  10          extern void InitLcd1602();
+  11          extern void LcdShowStr(unsigned char x,unsigned char y,unsigned char *str);
+  12          
+  13          void main(){
+  14   1        bit ack;
+  15   1        unsigned char str[10];
+  16   1        
+  17   1        //初始化液晶
+  18   1        InitLcd1602();
+  19   1        
+  20   1        ack = I2CAddressing(0x50);
+  21   1        str[0] = '5';
+  22   1        str[1] = '0';
+  23   1        str[2] = ':';
+  24   1        str[3] = (unsigned char)(ack)+'0';
+  25   1        str[4] = '\0';
+  26   1        LcdShowStr(0,0,str);
+  27   1        
+  28   1        ack = I2CAddressing(0x62);
+  29   1        str[0] = '6';
+  30   1        str[1] = '2';
+  31   1        str[2] = ':';
+  32   1        str[3] = (unsigned char)(ack)+'0';
+  33   1        str[4] = '\0';
+  34   1        LcdShowStr(8,0,str);
+  35   1        
+  36   1        while(1);
+  37   1      }
+  38          
+  39          void I2CStart(){
+  40   1        I2C_SDA = 1;
+  41   1        I2C_SCL = 1;
+  42   1        I2CDelay();
+  43   1        I2C_SDA = 0;
+  44   1        I2CDelay();
+  45   1        I2C_SCL = 0;
+  46   1      }
+  47          
+  48          void I2CStop(){
+  49   1        I2C_SCL = 0;
+  50   1        I2C_SDA = 0;
+  51   1        I2CDelay();
+  52   1        I2C_SCL = 1;
+  53   1        I2CDelay();
+  54   1        I2C_SDA = 1;
+C51 COMPILER V9.60.7.0   MAIN                                                              10/20/2024 11:49:40 PAGE 2   
+
+  55   1        I2CDelay();
+  56   1      }
+  57          
+  58          bit I2CWrite(unsigned char dat){
+  59   1        bit ack;
+  60   1        unsigned char mask;
+  61   1        
+  62   1        for(mask = 0x80;mask!=0;mask>>=1){
+  63   2          if((mask&dat)==0){
+  64   3            I2C_SDA = 0;
+  65   3          }else{
+  66   3            I2C_SDA = 1;
+  67   3          }
+  68   2          I2CDelay();
+  69   2          I2C_SCL = 1;
+  70   2          I2CDelay();
+  71   2          I2C_SCL = 0;
+  72   2        }
+  73   1        //
+  74   1        I2C_SDA = 1;
+  75   1        I2CDelay();
+  76   1        I2C_SCL = 1;
+  77   1        ack = I2C_SDA;
+  78   1        I2CDelay();
+  79   1        I2C_SCL = 0;
+  80   1        
+  81   1        return ack;
+  82   1      }
+  83          
+  84          bit I2CAddressing(unsigned char addr){
+  85   1        bit ack;
+  86   1        I2CStart();
+  87   1        ack = I2CWrite(addr<<1);
+  88   1        I2CStop();
+  89   1        return ack;
+  90   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    189    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      10
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       3
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

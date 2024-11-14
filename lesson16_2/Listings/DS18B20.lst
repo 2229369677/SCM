@@ -1,0 +1,125 @@
+C51 COMPILER V9.60.7.0   DS18B20                                                           10/30/2024 15:30:53 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE DS18B20
+OBJECT MODULE PLACED IN .\Objects\DS18B20.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE DS18B20.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\D
+                    -S18B20.lst) TABS(2) OBJECT(.\Objects\DS18B20.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          #include <intrins.h>
+   3          
+   4          sbit IO_18B20 = P3^2;
+   5          
+   6          void DelayX10us(unsigned char t){
+   7   1        do {
+   8   2            _nop_();
+   9   2            _nop_();
+  10   2            _nop_();
+  11   2            _nop_();
+  12   2            _nop_();
+  13   2            _nop_();
+  14   2            _nop_();
+  15   2            _nop_();
+  16   2        } while (--t);
+  17   1      }
+  18          
+  19          bit Get18B20Ack(){
+  20   1        bit ack;
+  21   1        
+  22   1        EA = 0;
+  23   1        IO_18B20 = 0;//产生500us复位脉冲
+  24   1        DelayX10us(50);
+  25   1        IO_18B20 = 1;
+  26   1        DelayX10us(6);
+  27   1        ack = IO_18B20;
+  28   1        while(!IO_18B20);
+  29   1        EA = 1;
+  30   1        
+  31   1        return ack;
+  32   1      }
+  33          
+  34          void Write18B20(unsigned char dat){
+  35   1        unsigned char mask;
+  36   1        
+  37   1        EA = 0;
+  38   1        for(mask = 0x01;mask!=0;mask<<=1){
+  39   2          IO_18B20 = 0;
+  40   2          _nop_();
+  41   2          _nop_();
+  42   2          if((mask&dat)==0){
+  43   3            IO_18B20 = 0;
+  44   3          }else{
+  45   3            IO_18B20 = 1;
+  46   3          }
+  47   2          DelayX10us(6);
+  48   2          IO_18B20 = 1;
+  49   2        }
+  50   1        EA = 1;
+  51   1      }
+  52          
+  53          unsigned char Read18B20(){
+  54   1        unsigned char dat;
+C51 COMPILER V9.60.7.0   DS18B20                                                           10/30/2024 15:30:53 PAGE 2   
+
+  55   1        unsigned char mask;
+  56   1        
+  57   1        EA = 0;
+  58   1        for(mask=0x01;mask!=0;mask<<=1){
+  59   2          IO_18B20 = 0;
+  60   2          _nop_();
+  61   2          _nop_();
+  62   2          IO_18B20 = 1;
+  63   2          _nop_();
+  64   2          _nop_();
+  65   2          if(!IO_18B20){
+  66   3            dat&=~mask;
+  67   3          }else{
+  68   3            dat |= mask;
+  69   3          }
+  70   2          DelayX10us(6);
+  71   2        }
+  72   1        EA = 1;
+  73   1        
+  74   1        return dat;
+  75   1      }
+  76          
+  77          bit Start18B20(){
+  78   1        bit ack;
+  79   1        
+  80   1        ack = Get18B20Ack();
+  81   1        if(ack==0){
+  82   2          Write18B20(0xcc);//跳过ROM操作
+  83   2          Write18B20(0x44);//启动一次温度转换
+  84   2        }
+  85   1        return ~ack;
+  86   1      }
+  87          
+  88          bit Get18B20Temp(int *temp){
+  89   1        bit ack;
+  90   1        unsigned char LSB,MSB;
+  91   1        if(ack==0){
+  92   2          Write18B20(0xcc);
+  93   2          Write18B20(0xbe);//发送读命令
+  94   2          LSB = Read18B20();
+  95   2          MSB = Read18B20();
+  96   2          *temp= ((int)MSB<<8)+LSB;//合成为16bit整数
+  97   2        }
+  98   1        return ~ack;
+  99   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    182    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----       3
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

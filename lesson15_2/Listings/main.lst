@@ -1,0 +1,211 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              10/23/2024 17:23:39 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          //用突发读写模式访问DS1302，并将日期时间显示在液晶上
+   2          
+   3          #include <REG52.H>
+   4          
+   5          sbit DS1302_CE = P1^7;
+   6          sbit DS1302_CK = P3^5;
+   7          sbit DS1302_IO = P3^4;
+   8          
+   9          bit flag200ms = 0;
+  10          unsigned char T0RH;
+  11          unsigned char T0RL;
+  12          
+  13          void ConfigTimer0(unsigned int ms);
+  14          void InitDS1302();
+  15          void DS1302BurstRead(unsigned char *dat);
+  16          extern void InitLcd1602();
+  17          extern void LcdShowStr(unsigned char x,unsigned char y,unsigned char *str);
+  18          
+  19          void main(){
+  20   1        unsigned char psec = 0xaa;
+  21   1        unsigned char time[8];
+  22   1        unsigned char str[12];
+  23   1        
+  24   1        EA = 1;
+  25   1        ConfigTimer0(1);
+  26   1        InitDS1302();
+  27   1        InitLcd1602();
+  28   1        
+  29   1        while(1){
+  30   2          if(flag200ms){
+  31   3            flag200ms = 0;
+  32   3            DS1302BurstRead(time);
+  33   3            if(psec != time[0]){//不一样就更新
+  34   4              str[0] = '2';
+  35   4              str[1] = '0';
+  36   4              str[2] = (time[6]>>4)+'0';//年
+  37   4              str[3] = (time[6]&0x0f)+'0';
+  38   4              str[4] = '-';
+  39   4              str[5] = (time[4]>>4)+'0';//月
+  40   4              str[6] = (time[4]&0x0f)+'0';
+  41   4              str[7] = '-';
+  42   4              str[8] = (time[3] >> 4) + '0';//日
+  43   4                      str[9] = (time[3]&0x0F) + '0';
+  44   4                      str[10] = '\0';
+  45   4                      LcdShowStr(0, 0, str);//显示到液晶的第一行
+  46   4              
+  47   4              str[0] = (time[5]&0x0F) + '0'; 
+  48   4                      str[1] = '\0';
+  49   4                      LcdShowStr(11, 0, "week");
+  50   4                      LcdShowStr(15, 0, str);
+  51   4                      
+  52   4                      str[0] = (time[2] >> 4) + '0';//时
+  53   4                      str[1] = (time[2]&0x0F) + '0';
+  54   4                      str[2] = ':';
+C51 COMPILER V9.60.7.0   MAIN                                                              10/23/2024 17:23:39 PAGE 2   
+
+  55   4                      str[3] = (time[1] >> 4) + '0';//分
+  56   4                      str[4] = (time[1]&0x0F) + '0';
+  57   4                      str[5] = ':';
+  58   4                      str[6] = (time[0] >> 4) + '0';//秒
+  59   4                      str[7] = (time[0]&0x0F) + '0';
+  60   4                      str[8] = '\0';
+  61   4                      LcdShowStr(4, 1, str);//显示到第二行
+  62   4              
+  63   4              psec = time[0];//用当前值更新上次秒数
+  64   4            }
+  65   3          }
+  66   2        }
+  67   1      }
+  68          
+  69          void DS1302ByteWrite(unsigned char dat){
+  70   1        unsigned char mask;
+  71   1        for(mask = 0x01;mask!=0;mask<<=1){
+  72   2          if((mask&dat)!=0){
+  73   3            DS1302_IO = 1;
+  74   3          }else{
+  75   3            DS1302_IO = 0;
+  76   3          }
+  77   2          DS1302_CK = 1;
+  78   2          DS1302_CK = 0;
+  79   2        }
+  80   1        DS1302_IO = 1;
+  81   1      }
+  82          
+  83          unsigned char DS1302ByteRead(){
+  84   1        unsigned char mask;
+  85   1        unsigned char dat = 0;
+  86   1        
+  87   1        for(mask = 0x01;mask!=0;mask<<=1){
+  88   2          if(DS1302_IO!=0){
+  89   3            dat|=mask;
+  90   3          }
+  91   2          DS1302_CK = 1;
+  92   2          DS1302_CK = 0;
+  93   2        }
+  94   1        return dat;
+  95   1      }
+  96          
+  97          void DS1302SingleWrite(unsigned char reg,unsigned char dat){
+  98   1        DS1302_CE = 1;
+  99   1        DS1302ByteWrite((reg<<1)|0x80);
+ 100   1        DS1302ByteWrite(dat);
+ 101   1        DS1302_CE = 0;
+ 102   1      }
+ 103          
+ 104          unsigned char DS1302SingleRead(unsigned char reg){
+ 105   1        unsigned char dat;
+ 106   1        
+ 107   1        DS1302_CE = 1;
+ 108   1        DS1302ByteWrite((reg<<1)|0x81);
+ 109   1        dat = DS1302ByteRead();
+ 110   1        DS1302_CE = 0;
+ 111   1        return dat;
+ 112   1      }
+ 113          
+ 114          //突发模式连续写入8个
+ 115          void DS1302BurstWrite(unsigned char* dat){
+ 116   1        unsigned char i;
+C51 COMPILER V9.60.7.0   MAIN                                                              10/23/2024 17:23:39 PAGE 3   
+
+ 117   1        
+ 118   1        DS1302_CE = 1;
+ 119   1        DS1302ByteWrite(0xBE);
+ 120   1        for(i = 0;i<8;i++){
+ 121   2          DS1302ByteWrite(dat[i]);
+ 122   2        }
+ 123   1        DS1302_CE = 0;
+ 124   1      }
+ 125          
+ 126          //突发模式连续读8个
+ 127          void DS1302BurstRead(unsigned char*dat){
+ 128   1        unsigned char i;
+ 129   1        
+ 130   1        DS1302_CE = 1;
+ 131   1        DS1302ByteWrite(0xbf);
+ 132   1        for(i = 0;i<8;i++){
+ 133   2          dat[i] = DS1302ByteRead();
+ 134   2        }
+ 135   1        DS1302_CE = 0;
+ 136   1      }
+ 137          
+ 138          void InitDS1302(){
+ 139   1        unsigned char dat;
+ 140   1        unsigned char code InitTime[]={
+ 141   1          0x00,0x00,0x16,0x23,0x10,0x02,0x24,0x00
+ 142   1        };
+ 143   1        
+ 144   1        DS1302_CE = 0;
+ 145   1        DS1302_CK= 0;
+ 146   1        dat = DS1302SingleRead(0);
+ 147   1        if((dat&0x80)!=0){
+ 148   2          DS1302SingleWrite(7,0x00);
+ 149   2          DS1302BurstWrite(InitTime);
+ 150   2        }
+ 151   1      }
+ 152          
+ 153          
+ 154          void ConfigTimer0(unsigned int ms){
+ 155   1        unsigned long tmp;
+ 156   1        
+ 157   1        tmp = 11059200/12;
+ 158   1        tmp = (tmp*ms)/1000;
+ 159   1        tmp = 65536-tmp;
+ 160   1        tmp+=12;
+ 161   1        T0RH = (unsigned char)(tmp>>8);
+ 162   1        T0RL = (unsigned char)tmp;
+ 163   1        
+ 164   1        TMOD &=0xf0;
+ 165   1        TMOD |=0x01;
+ 166   1        TH0 = T0RH;
+ 167   1        TL0 = T0RL;
+ 168   1        ET0 = 1;
+ 169   1        TR0 = 1;
+ 170   1      }
+ 171          
+ 172          void InterruptTime0() interrupt 1{
+ 173   1        static unsigned char tmr200ms = 0;
+ 174   1        TH0 = T0RH;
+ 175   1        TL0 = T0RL;
+ 176   1        tmr200ms++;
+ 177   1        if(tmr200ms>=200){
+ 178   2          tmr200ms = 0;
+C51 COMPILER V9.60.7.0   MAIN                                                              10/23/2024 17:23:39 PAGE 4   
+
+ 179   2          flag200ms = 1;
+ 180   2        }
+ 181   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    574    ----
+   CONSTANT SIZE    =     13    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3      31
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

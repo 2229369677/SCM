@@ -1,0 +1,121 @@
+C51 COMPILER V9.60.7.0   UART                                                              10/16/2024 20:51:37 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN .\Objects\Uart.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE Uart.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\Uart
+                    -.lst) TABS(2) OBJECT(.\Objects\Uart.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          bit flagFrame = 0;//帧接收完成标志,即接收到了一帧新数据
+   4          bit flagTxd = 0;//单字节发送完成标志，用来替代TXD中断标志位
+   5          unsigned char cntRxd = 0;  
+   6          unsigned char pdata bufRxd[64]; 
+   7          
+   8          extern void UartAction(unsigned char *buf, unsigned char len);
+   9          
+  10          void ConfigUART(unsigned int baud){
+  11   1        SCON = 0x50;//模式1
+  12   1        TMOD &= 0x0f;
+  13   1        TMOD |= 0x20;
+  14   1        TH1 = 256-(11059200/12/32)/baud;
+  15   1        TL1 = TH1;
+  16   1        ET1 = 0;//禁用T1中断
+  17   1        ES = 1;//串口中断
+  18   1        TR1 = 1;//启动T1
+  19   1      }
+  20          
+  21          //串口数据写入
+  22          void UartWrite(unsigned char *buf,unsigned char len){
+  23   1        while(len--){
+  24   2          flagTxd = 0;//
+  25   2          SBUF =*buf++;
+  26   2          while(!flagTxd);//发送完毕
+  27   2        }
+  28   1      }
+  29          
+  30          //串口读取命令函数
+  31          unsigned char UartRead(unsigned char *buf, unsigned char len){
+  32   1        unsigned char i;
+  33   1        
+  34   1        if(len>cntRxd){
+  35   2          len = cntRxd;
+  36   2        }
+  37   1        for(i = 0;i<len;i++){
+  38   2          *buf++ = bufRxd[i];
+  39   2        }
+  40   1        cntRxd = 0;
+  41   1        
+  42   1        return len;
+  43   1      }
+  44          
+  45          //串口驱动
+  46          void UartDriver(){
+  47   1        unsigned  char len;
+  48   1        unsigned char pdata buf[40];
+  49   1        
+  50   1        //读取命令,进行相应操作
+  51   1        if(flagFrame){
+  52   2          flagFrame = 0;
+  53   2          len  = UartRead(buf,sizeof(buf));//将接收到的命令读取到缓冲区中
+  54   2          UartAction(buf,len);//进行相应操作
+C51 COMPILER V9.60.7.0   UART                                                              10/16/2024 20:51:37 PAGE 2   
+
+  55   2        }
+  56   1      }
+  57          
+  58          //要监控什么？？？
+  59          //判断帧是否结束,30ms空闲时间-结束
+  60          void UartRxMonitor(unsigned char ms){
+  61   1        static unsigned char cntbkp = 0;
+  62   1        static unsigned char idletmr = 0;
+  63   1        
+  64   1        if(cntRxd>0){
+  65   2          if(cntbkp!=cntRxd){
+  66   3            cntbkp = cntRxd;
+  67   3            idletmr = 0;
+  68   3          }
+  69   2          else{
+  70   3            if(idletmr<30){
+  71   4              idletmr+=ms;//到达30ms，一帧接收完毕
+  72   4              if(idletmr>=30){
+  73   5                flagFrame = 1;
+  74   5              }
+  75   4            }
+  76   3          }
+  77   2        }
+  78   1        else{
+  79   2          cntbkp = 0;
+  80   2        }
+  81   1      }
+  82          
+  83          //串口中断
+  84          void InterruptUART() interrupt 4{
+  85   1        if(RI){
+  86   2          RI = 0;
+  87   2          if(cntRxd<sizeof(bufRxd)){
+  88   3            bufRxd[cntRxd++] = SBUF;//存入接收缓冲区
+  89   3          }
+  90   2        }
+  91   1        if(TI){
+  92   2          TI = 0;
+  93   2          flagTxd = 1;//字节发送完成标志
+  94   2        }
+  95   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    255    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =     64      40
+   DATA SIZE        =      3       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

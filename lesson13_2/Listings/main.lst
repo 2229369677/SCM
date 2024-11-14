@@ -1,0 +1,147 @@
+C51 COMPILER V9.60.7.0   MAIN                                                              10/16/2024 20:51:37 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) TABS(2) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          sbit BUZZ = P1^6;
+   4          
+   5          bit flagBuzzOn = 0;
+   6          unsigned char T0RH = 0;
+   7          unsigned char T0RL = 0;
+   8          
+   9          void ConfigTimer0(unsigned int ms);
+  10          extern void UartDriver();
+  11          extern void ConfigUART(unsigned int baud);  
+  12          extern void UartRxMonitor(unsigned char ms);
+  13          extern void UartWrite(unsigned char *buf, unsigned char len);
+  14          extern void InitLcd1602();
+  15          extern void LcdShowStr(unsigned char x, unsigned char y, unsigned char *str);
+  16          extern void LcdAreaClear(unsigned char x, unsigned char y, unsigned char len);
+  17          
+  18          void main(){
+  19   1        EA = 1;           
+  20   1        ConfigTimer0(1);  
+  21   1        ConfigUART(9600);
+  22   1        InitLcd1602();    
+  23   1        
+  24   1        while (1)
+  25   1        {
+  26   2            UartDriver();
+  27   2        }
+  28   1      }
+  29          
+  30          
+  31          void ConfigTimer0(unsigned int ms){
+  32   1        unsigned int temp;
+  33   1        
+  34   1        temp = 11095200/12;
+  35   1        temp = (temp*ms)/1000;
+  36   1        temp = 65536-temp;
+  37   1        temp+=33;//补偿
+  38   1        
+  39   1        T0RH = (unsigned char)(temp>>8);
+  40   1        T0RL = (unsigned char)temp;
+  41   1        
+  42   1        TMOD &=0x0f;
+  43   1        TMOD |= 0x01;
+  44   1        TH0 = T0RH;
+  45   1        TL0 = T0RL;
+  46   1        ET0 = 1;
+  47   1        TR0 = 1;
+  48   1      }
+  49          
+  50          bit CmpMemory(unsigned char *ptr1,unsigned char *ptr2,unsigned char len){
+  51   1        while(len--){
+  52   2          if(*ptr1++ != *ptr2++){
+  53   3            return 0;
+  54   3          }
+C51 COMPILER V9.60.7.0   MAIN                                                              10/16/2024 20:51:37 PAGE 2   
+
+  55   2        }
+  56   1        return 1;
+  57   1      }
+  58          
+  59          void UartAction(unsigned char *buf, unsigned char len){
+  60   1        unsigned char i;
+  61   1        unsigned char code cmd0[] = "buzz on"; 
+  62   1        unsigned char code cmd1[] = "buzz off";
+  63   1        unsigned char code cmd2[] = "showstr ";
+  64   1        
+  65   1        unsigned char code cmdLen[] = {
+  66   1          sizeof(cmd0)-1,sizeof(cmd1)-1,sizeof(cmd2)-1
+  67   1        };
+  68   1        
+  69   1        unsigned char code *cmdPtr[] = {
+  70   1          &cmd0[0],&cmd1[0],&cmd2[0]
+  71   1        };
+  72   1        
+  73   1        for(i = 0;i<sizeof(cmdLen);i++){
+  74   2          if(len>=cmdLen[i]){//长度比较
+  75   3            if(CmpMemory(buf,cmdPtr[i],cmdLen[i])){
+  76   4              break;
+  77   4            }
+  78   3          }
+  79   2        }
+  80   1        switch(i){
+  81   2          case 0:{
+  82   3            flagBuzzOn = 1;
+  83   3            break;
+  84   3          }
+  85   2          case 1:{
+  86   3            flagBuzzOn = 0;
+  87   3            break;
+  88   3          }
+  89   2          case 2:{
+  90   3            //要显示后面的字符串
+  91   3            buf[len] = '\0';
+  92   3            LcdShowStr(0,0,buf+cmdLen[2]);
+  93   3            i = len-cmdLen[2];
+  94   3            if(i<16){
+  95   4              LcdAreaClear(i,0,16-i);//>16，清除后面的字符
+  96   4            }
+  97   3            break;
+  98   3          }
+  99   2          default:{
+ 100   3            UartWrite("bad command.\r\n",sizeof("bad command.\r\n")-1);//给上机发送错误命令的提示
+ 101   3            return;
+ 102   3          }
+ 103   2        }
+ 104   1        buf[len++] = '\r';
+ 105   1        buf[len++] = '\n';
+ 106   1        UartWrite(buf,len);
+ 107   1      }
+ 108          
+ 109          void InterruptTimer0() interrupt 1{
+ 110   1        TH0 = T0RH;
+ 111   1        TL0 = T0RL;
+ 112   1        if(flagBuzzOn){
+ 113   2          BUZZ = ~BUZZ;
+ 114   2        }
+ 115   1        else{
+ 116   2          BUZZ  = 1;
+C51 COMPILER V9.60.7.0   MAIN                                                              10/16/2024 20:51:37 PAGE 3   
+
+ 117   2        }
+ 118   1        UartRxMonitor(1);//串口接收监控
+ 119   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    417    ----
+   CONSTANT SIZE    =     50    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      2      17
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,126 @@
+C51 COMPILER V9.60.7.0   INFRARED                                                          10/30/2024 11:57:45 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE INFRARED
+OBJECT MODULE PLACED IN .\Objects\infrared.obj
+COMPILER INVOKED BY: C:\Keil_v5\C51\BIN\C51.EXE infrared.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\
+                    -infrared.lst) TABS(2) OBJECT(.\Objects\infrared.obj)
+
+line level    source
+
+   1          #include <REG52.H>
+   2          
+   3          sbit IR_INPUT = P3^3;
+   4          
+   5          bit irflag = 0;//红外接收标志
+   6          unsigned char ircode[4];//红外代码接收缓冲区
+   7          
+   8          void InitInfrared(){
+   9   1        IR_INPUT = 1;//确保被释放
+  10   1        TMOD &= 0x0f;
+  11   1        TMOD |= 0x10;
+  12   1        TR1 = 0;
+  13   1        ET1 = 0;//禁用T1中断
+  14   1        IT1 = 1;//负边沿触发,下降沿
+  15   1        EX1 = 1;
+  16   1      }
+  17          
+  18          
+  19          //获取当前高电平的持续时间
+  20          unsigned int GetHighTime(){
+  21   1        TH1 = 0;
+  22   1        TL1 = 0;
+  23   1        TR1 = 1;//启动T1计数
+  24   1        while(IR_INPUT){
+  25   2          if(TH1>=0x40){//防止错误信号，造成程序假死
+  26   3            break;
+  27   3          }
+  28   2        }
+  29   1        TR1 = 0;
+  30   1        
+  31   1        return (TH1*256 + TL1);
+  32   1      }
+  33          
+  34          unsigned int GetLowTime()
+  35          {
+  36   1          TH1 = 0;
+  37   1          TL1 = 0;
+  38   1          TR1 = 1;
+  39   1          while (!IR_INPUT){
+  40   2              if (TH1 >= 0x40){         
+  41   3                  break;
+  42   3              }
+  43   2          }
+  44   1          TR1 = 0;
+  45   1      
+  46   1          return (TH1*256 + TL1);  
+  47   1      }
+  48          
+  49          void EXINT1_ISR() interrupt 2{
+  50   1        unsigned char i,j;
+  51   1        unsigned char byt;
+  52   1        unsigned int time;
+  53   1        
+  54   1        //引导码
+C51 COMPILER V9.60.7.0   INFRARED                                                          10/30/2024 11:57:45 PAGE 2   
+
+  55   1        time = GetLowTime;
+  56   1        if((time<7833)||(time>8755)){
+  57   2          IE1 = 0;//清零INT1中断标志
+  58   2          return;
+  59   2        }
+  60   1        
+  61   1        time = GetHighTime();
+  62   1        if ((time<3686) || (time>4608))
+  63   1        {                              
+  64   2            IE1 = 0;
+  65   2            return;
+  66   2        }
+  67   1        
+  68   1        //接收4个字节,用户码，用户反码，键码，键码反码
+  69   1        
+  70   1        for(i = 0;i<4;i++){
+  71   2          //8个bit
+  72   2          for(j = 0;j<8;j++){
+  73   3            time = GetLowTime();
+  74   3            if ((time<313) || (time>718))
+  75   3            {                             
+  76   4                IE1 = 0;
+  77   4                return;
+  78   4            }
+  79   3      
+  80   3            time = GetHighTime();
+  81   3            if ((time>313) && (time<718)) 
+  82   3            {   
+  83   4                byt >>= 1;
+  84   4            }
+  85   3            else if ((time>1345) && (time<1751))
+  86   3            {                                   
+  87   4                byt >>= 1;  
+  88   4                byt |= 0x80; 
+  89   4            }
+  90   3            else
+  91   3            {
+  92   4                IE1 = 0;
+  93   4                return;
+  94   4            }
+  95   3          }
+  96   2          ircode[i] = byt;
+  97   2        }
+  98   1        irflag = 1;
+  99   1        IE1 = 0;
+ 100   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    286    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      4       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
